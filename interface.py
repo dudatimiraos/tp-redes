@@ -46,6 +46,10 @@ class Jogo:
         thread_ouvir.daemon = True
         thread_ouvir.start()
 
+        # Variáveis para o timer
+        self.timer_warning = None
+        self.timer_disconnect = None
+
     def enviar_apelido(self):
         # Enviar apelido para o servidor
         apelido = self.apelido_entry.get()
@@ -58,6 +62,9 @@ class Jogo:
 
         # Exibir opções de escolha
         self.exibir_opcoes()
+
+        # Iniciar o timer de inatividade
+        self.iniciar_timer()
 
     def exibir_opcoes(self):
         # Botões para as escolhas com um layout mais espaçado
@@ -78,11 +85,23 @@ class Jogo:
         self.cliente.send(escolha.encode())
         self.desabilitar_botoes()
 
+        # Reiniciar o timer após uma escolha
+        self.reiniciar_timer()
+
     def desabilitar_botoes(self):
         # Desabilitar os botões após a escolha
         self.pedra_button.config(state=tk.DISABLED)
         self.papel_button.config(state=tk.DISABLED)
         self.tesoura_button.config(state=tk.DISABLED)
+
+    def habilitar_botoes(self):
+        # Habilitar os botões para um novo jogo
+        self.pedra_button.config(state=tk.NORMAL)
+        self.papel_button.config(state=tk.NORMAL)
+        self.tesoura_button.config(state=tk.NORMAL)
+
+        # Reiniciar o timer para uma nova rodada
+        self.reiniciar_timer()
 
     def ouvir_servidor(self):
         while True:
@@ -96,11 +115,26 @@ class Jogo:
                 print("Erro ao se comunicar com o servidor.")
                 break
 
-    def habilitar_botoes(self):
-        # Habilitar os botões para um novo jogo
-        self.pedra_button.config(state=tk.NORMAL)
-        self.papel_button.config(state=tk.NORMAL)
-        self.tesoura_button.config(state=tk.NORMAL)
+    def iniciar_timer(self):
+        # Inicia o timer de aviso e desconexão
+        self.timer_warning = self.master.after(90000, self.exibir_aviso)  # 1:30 minutos
+        self.timer_disconnect = self.master.after(120000, self.desconectar_jogador)  # 2 minutos
+
+    def reiniciar_timer(self):
+        # Cancela os timers e os reinicia
+        if self.timer_warning:
+            self.master.after_cancel(self.timer_warning)
+        if self.timer_disconnect:
+            self.master.after_cancel(self.timer_disconnect)
+        self.iniciar_timer()
+
+    def exibir_aviso(self):
+        messagebox.showwarning("Aviso", "Escolha uma ação ou será desconectado em 30 segundos!")
+
+    def desconectar_jogador(self):
+        messagebox.showinfo("Desconectado", "Você foi desconectado por inatividade.")
+        self.master.quit()  # Fecha a interface
+        self.cliente.close()  # Fecha a conexão
 
 
 # Inicialize a interface para o Jogador quando você decidir
