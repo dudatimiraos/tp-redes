@@ -20,11 +20,11 @@ Bibliotecas padrão:
 Instruções de Uso
 1. Clonar o Repositório
 Clone este repositório na sua máquina local:
-git clone https://github.com/usuario/jogo-pedra-papel-tesoura.git
+git clone https://github.com/dudatimiraos/tp-redes
 
 2. Iniciar o Servidor
 Execute o seguinte comando no terminal para iniciar o servidor:
-python servidor.py
+    python servidor.py
 
     O servidor ficará aguardando a conexão de dois jogadores.
 
